@@ -1,10 +1,15 @@
-FROM node:10
+FROM node:alpine AS builder
 
 WORKDIR /usr/src/app
 
-COPY ./ ./
+COPY package.json ./
 
 RUN npm install
 
+COPY ./ ./
 
-CMD ["node", "server.js"]
+RUN npm run build
+
+FROM nginx
+
+COPY --from=builder /usr/src/app/build /usr/share/nginx/html
